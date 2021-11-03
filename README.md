@@ -101,7 +101,7 @@ Install the Data:
   * You can create your own, just make sure to be consistent, while using that in the command
 
 * ##### Run the Postgres Container
-  * > ``docker run --rm --name pg-owcc -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=SecretSauce -e POSTGRES_DB=owcc -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres``
+  * > ``docker run --rm --name <container-name> -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=SecretSauce -e POSTGRES_DB=<bd_name> -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres``
   * make sure to correctly specify the directory according to your setup
 
 * ##### Check if the container is Running
@@ -121,34 +121,6 @@ Install the Data:
     * You can use DataGrip (a JetBrains product) to connect to the DB.
     * You just need to provide the `database_name`, `host`, `username` and `password` in the
       database-wizard to connect
-    * You can check in the below Image the connection is successful
-
-    ![Postgress Successful Connection](src/main/resources/static/postgress-properties.png)
-
-<br>
-<br>
-
-* ##### Setting up the Schema
-  * For this to properly work, you need to set the schema to this postgres instance
-  * Head over to the `src/main/java/resource/db.migration` folder of this project and
-    locate [V1__create_contact_tables.sql  file](https://bitbucket.org/zetaengg/owcc-ssc/src/master/src/main/resources/db/migration/V1__create_contact_tables.sql)
-  * ###### Using docker
-    * Copy the file to the docker Container
-    * > `docker cp ./V1__create_contact_tables.sql pg-owcc:/V1__create_contact_tables.sql`
-    * Execute and build the sql file from docker.
-    * > `docker exec -u postgres pg-owcc psql owcc postgres -f /V1__create_contact_tables.sql`
-  * ###### Using Intellij ultimate
-    * You need to run the schema present in this file
-    * Open the file in Intellij, It will give you a run button on that file
-    * Here also I have used the Intellij Ide to run the schema
-
-* ##### Stop the DB
-  * Once done you can stop the postgres container
-  * > ``docker container stop pg-owcc``
-  * > ``docker container ls --all``
-* ##### Restart the DB
-  * And if you wish to use it again you can just do
-  * > ``docker container start pg-owcc``
 
 <br>
 <br>
@@ -160,7 +132,7 @@ Install the Data:
     Docker container
   * eg. Currently, The datasource related properties in the `application-local.properties` are
   ```## PostgreSQL
-  spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/owcc
+  spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/<dbname>
   spring.datasource.username=postgres
   spring.datasource.password=SecretSauce
   ```
@@ -170,37 +142,8 @@ Install the Data:
 ## Executing jar
 
 With local Profile
-> ```java -jar -Dspring.profiles.active=local  target/owcc-ssc.jar```
+> ```java -jar -Dspring.profiles.active=local  target/<application_name>.jar```
 
 ### Executing tests
 
 > ```mvn test```
-
-
-Build from local (Until CI job is ready)
-
-* > ```mvn clean package```
-* > ```docker build -t 813361731051.dkr.ecr.ap-south-1.amazonaws.com/owcc-ssc:<version>```
-* > ```docker push 813361731051.dkr.ecr.ap-south-1.amazonaws.com/owcc-ssc:<version>```
-
-### Project Configuration
-
-![Run Configurations](src/main/resources/static/Run_Debug_Configuration.png)
-
-
-Pending tasks
---------
-
-* Revisit Dockerfile
-  * Try alpine
-* CI/CD
-  * Jenkinsfile
-  * BuildJob which builds helm chart as well
-* Logging
-* Monitoring
-  * Micrometer
-  * Enable ServiceMonitor
-  * JMX metrics
-* Error handling for APIS
-* Security
-  * Do not use argo's bearer tokens, create new ones with readonly permissions
